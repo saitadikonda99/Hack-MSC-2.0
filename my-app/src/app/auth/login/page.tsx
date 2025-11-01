@@ -57,7 +57,7 @@ const LoginPage = () => {
                     <div className="login-one-in">
                         <div className="login-one-one">
                             <Image
-                                src="/AxisBill.png"
+                                src="/1.png"
                                 alt="CivicIndia Logo"
                                 width={200}
                                 height={200}
@@ -126,7 +126,7 @@ const LoginPage = () => {
                 </div>
                 <div className="login-two">
                     <Image
-                        src="/Invoice.jpeg"
+                        src="/2.jpg"
                         alt="City Management"
                         width={200}
                         height={200}

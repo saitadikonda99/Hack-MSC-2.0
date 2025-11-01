@@ -8,12 +8,12 @@ import {
   HiUpload, 
   HiPhotograph, 
   HiChartBar, 
-  HiClipboardList, 
-  HiExclamation, 
-  HiCog,
+  HiUser,
   HiUsers,
   HiTrendingUp,
-  HiHeart
+  HiHeart,
+  HiCog,
+  HiUserGroup
 } from 'react-icons/hi';
 import { HiWrenchScrewdriver } from 'react-icons/hi2';
 import { PiCoin } from 'react-icons/pi';
@@ -54,19 +54,9 @@ const OrganizationSidebarOptions = [
     icon: () => <IconComponent icon={HiChartBar} />
   },
   {
-    name: 'My Reports',
-    link: '/dashboard/my-reports',
-    icon: () => <IconComponent icon={HiClipboardList} />
-  },
-  {
-    name: 'Emergency',
-    link: '/dashboard/emergency',
-    icon: () => <IconComponent icon={HiExclamation} />
-  },
-  {
-    name: 'Settings',
-    link: '/dashboard/settings',
-    icon: () => <IconComponent icon={HiCog} />
+    name: 'Profile',
+    link: '/profile',
+    icon: () => <IconComponent icon={HiUser} />
   }
 ];
 
@@ -109,6 +99,69 @@ const AdminSidebarOptions = [
   }
 ];
 
+// Super Admin Sidebar Options
+const SuperAdminSidebarOptions = [
+  {
+    name: 'Dashboard',
+    link: '/admin/dashboard',
+    icon: () => <IconComponent icon={HiHome} />
+  },
+  {
+    name: 'All Reports',
+    link: '/admin/reports',
+    icon: () => <IconComponent icon={HiChartBar} />
+  },
+  {
+    name: 'Users',
+    link: '/admin/users',
+    icon: () => <IconComponent icon={HiUsers} />
+  },
+  {
+    name: 'Contractors',
+    link: '/admin/contractors',
+    icon: () => <IconComponent icon={HiUserGroup} />
+  },
+  {
+    name: 'Analytics',
+    link: '/admin/analytics',
+    icon: () => <IconComponent icon={HiTrendingUp} />
+  },
+  {
+    name: 'Manage Issues',
+    link: '/admin/manage',
+    icon: () => <IconComponent icon={HiWrenchScrewdriver} />
+  },
+  {
+    name: 'System Health',
+    link: '/admin/health',
+    icon: () => <IconComponent icon={HiHeart} />
+  },
+  {
+    name: 'Settings',
+    link: '/admin/settings',
+    icon: () => <IconComponent icon={HiCog} />
+  }
+];
+
+// Contractor Sidebar Options
+const ContractorSidebarOptions = [
+  {
+    name: 'Dashboard',
+    link: '/contractor/dashboard',
+    icon: () => <IconComponent icon={HiHome} />
+  },
+  {
+    name: 'My Jobs',
+    link: '/contractor/jobs',
+    icon: () => <IconComponent icon={HiWrenchScrewdriver} />
+  },
+  {
+    name: 'Profile',
+    link: '/profile',
+    icon: () => <IconComponent icon={HiUser} />
+  }
+];
+
 const sidebar = ({ role }: { role: string }) => {
   const pathname = usePathname()
   const { totalPoints, availablePoints, loading } = usePoints()
@@ -138,6 +191,28 @@ const sidebar = ({ role }: { role: string }) => {
                     </div>
                 ))}
                 {role === "admin" && AdminSidebarOptions.map((option) => (
+                    <div 
+                        className={`sidebar-option ${isActiveLink(option.link) ? 'active' : ''}`} 
+                        key={option.name}
+                    >
+                        <Link href={option.link}>
+                            <option.icon />
+                            {option.name}
+                        </Link>
+                    </div>
+                ))}
+                {role === "super_admin" && SuperAdminSidebarOptions.map((option) => (
+                    <div 
+                        className={`sidebar-option ${isActiveLink(option.link) ? 'active' : ''}`} 
+                        key={option.name}
+                    >
+                        <Link href={option.link}>
+                            <option.icon />
+                            {option.name}
+                        </Link>
+                    </div>
+                ))}
+                {role === "contractor" && ContractorSidebarOptions.map((option) => (
                     <div 
                         className={`sidebar-option ${isActiveLink(option.link) ? 'active' : ''}`} 
                         key={option.name}

@@ -7,7 +7,7 @@ import Sidebar from './sidebar/sidebar'
 
 import './dashboard.css'
 
-const dashboard = ({children}: {children: React.ReactNode}) => {
+const dashboard = ({children, role = "organization"}: {children: React.ReactNode, role?: string}) => {
   return (
     <div className="DashboardComponent">
         <div className="DashboardComponent-in">
@@ -16,7 +16,7 @@ const dashboard = ({children}: {children: React.ReactNode}) => {
             </div>
             <div className="dashboard-two">
                 <div className="dashboard-two-one">
-                    <Sidebar role="organization" />
+                    <Sidebar role={role} />
                 </div>
                 <div className="dashboard-two-two">
                     <div className="dashboard-two-two-in">

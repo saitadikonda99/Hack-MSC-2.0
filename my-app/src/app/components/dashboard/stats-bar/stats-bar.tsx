@@ -26,13 +26,13 @@ const StatsBar: React.FC<StatsBarProps> = ({ reports }) => {
         </div>
         <div className="p-3 rounded-lg border border-zinc-100">
           <div className="text-2xl font-bold text-zinc-900">
-            {reports.filter(r => r.status === 'assigned').length}
+            {reports.filter(r => r.status === 'assigned' || r.status === 'in_progress').length}
           </div>
           <div className="text-sm text-zinc-600">In Progress</div>
         </div>
         <div className="p-3 rounded-lg border border-zinc-100">
           <div className="text-2xl font-bold text-zinc-900">
-            {reports.filter(r => r.status === 'fixed').length}
+            {reports.filter(r => r.status === 'fixed' || r.status === 'resolved').length}
           </div>
           <div className="text-sm text-zinc-600">Resolved</div>
         </div>
