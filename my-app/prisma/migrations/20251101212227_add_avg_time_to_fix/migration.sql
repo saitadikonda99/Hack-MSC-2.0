@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `reports` ADD COLUMN `avgTimeToFix` INTEGER NOT NULL DEFAULT 0;

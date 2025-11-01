@@ -11,6 +11,7 @@ interface Report {
   status: string
   createdAt: string
   imageUrl?: string
+  description?: string
 }
 
 interface GalleryTabProps {
@@ -30,7 +31,7 @@ const GalleryTab: React.FC<GalleryTabProps> = ({ reports }) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {reports.map((report) => (
-            <div key={report.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div key={report.id} className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
               {report.imageUrl && (
                 <img
                   src={report.imageUrl}
@@ -39,8 +40,8 @@ const GalleryTab: React.FC<GalleryTabProps> = ({ reports }) => {
                 />
               )}
               <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-bold text-lg capitalize">{report.issueType}</h3>
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="font-bold text-lg capitalize text-gray-800">{report.issueType}</h3>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     report.status === 'pending' ? 'bg-red-100 text-red-800' :
                     report.status === 'assigned' ? 'bg-yellow-100 text-yellow-800' :
@@ -49,15 +50,24 @@ const GalleryTab: React.FC<GalleryTabProps> = ({ reports }) => {
                     {report.status}
                   </span>
                 </div>
-                <p className="text-gray-600 text-sm mb-2">
-                  Severity: {report.severity}/10
-                </p>
-                <p className="text-gray-500 text-xs">
-                  Location: {report.lat.toFixed(4)}, {report.lng.toFixed(4)}
-                </p>
-                <p className="text-gray-500 text-xs">
-                  Reported: {new Date(report.createdAt).toLocaleDateString()}
-                </p>
+                {report.description && (
+                  <div className="mb-3 p-2 bg-gray-50 rounded border-l-2 border-gray-300">
+                    <p className="text-gray-700 text-sm line-clamp-3">
+                      {report.description}
+                    </p>
+                  </div>
+                )}
+                <div className="space-y-1">
+                  <p className="text-gray-600 text-sm">
+                    Severity: <span className="font-semibold">{report.severity}/10</span>
+                  </p>
+                  <p className="text-gray-500 text-xs">
+                    📍 {report.lat.toFixed(4)}, {report.lng.toFixed(4)}
+                  </p>
+                  <p className="text-gray-500 text-xs">
+                    📅 {new Date(report.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
               </div>
             </div>
           ))}

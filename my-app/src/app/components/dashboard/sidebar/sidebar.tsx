@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { 
   HiHome, 
-  HiMap, 
   HiUpload, 
   HiPhotograph, 
   HiChartBar, 
@@ -17,6 +16,8 @@ import {
   HiHeart
 } from 'react-icons/hi';
 import { HiWrenchScrewdriver } from 'react-icons/hi2';
+import { PiCoin } from 'react-icons/pi';
+import { usePoints } from '@/contexts/PointsContext';
 
 import './sidebar.css'
 
@@ -31,11 +32,6 @@ const OrganizationSidebarOptions = [
     name: 'Dashboard',
     link: '/dashboard',
     icon: () => <IconComponent icon={HiHome} />
-  },
-  {
-    name: 'Live Map',
-    link: '/dashboard?tab=map',
-    icon: () => <IconComponent icon={HiMap} />
   },
   {
     name: 'Report Issue',
@@ -115,6 +111,7 @@ const AdminSidebarOptions = [
 
 const sidebar = ({ role }: { role: string }) => {
   const pathname = usePathname()
+  const { totalPoints, availablePoints, loading } = usePoints()
   
   const isActiveLink = (link: string) => {
     if (link === '/dashboard' && pathname === '/dashboard') return true
@@ -154,10 +151,17 @@ const sidebar = ({ role }: { role: string }) => {
             </div>
             <div className="sidebar-footer">
                 <div className="civic-score-widget">
-                    <div className="text-center p-4 bg-gradient-to-r from-green-100 to-blue-100 rounded-lg mx-2">
-                        <div className="text-2xl mb-1">🏆</div>
-                        <div className="text-sm text-gray-600">Civic Score</div>
-                        <div className="text-xl font-bold text-green-600">87/100</div>
+                    <div className="text-center p-4 bg-white border border-gray-200 rounded-lg mx-2 shadow-sm">
+                        <div className="flex items-center justify-center gap-1 text-sm font-medium text-gray-700 mb-2">
+                            <PiCoin className="text-lg" />
+                            Civic Points
+                        </div>
+                        {loading ? (
+                            <div className="text-lg font-bold text-black">...</div>
+                        ) : (
+                            <div className="text-2xl font-bold text-black">{availablePoints}</div>
+                        )}
+                        <div className="text-xs text-gray-500 mt-1">Total Earned: {totalPoints}</div>
                     </div>
                 </div>
             </div>

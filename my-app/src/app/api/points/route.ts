@@ -16,21 +16,45 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
 
-    // Get user with points data
+    // Get user basic info
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       select: {
         id: true,
         name: true,
         email: true,
-        totalPoints: true,
-        availablePoints: true,
       }
     });
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    // Get all points transactions for this user
+    const allPoints = await prisma.point.findMany({
+      where: { userId: decoded.userId },
+      select: {
+        amount: true,
+        type: true,
+      }
+    });
+
+    // Calculate total points and available points from the points table
+    let totalPointsEarned = 0;
+    let totalPointsRedeemed = 0;
+
+    allPoints.forEach(point => {
+      if (point.amount > 0) {
+        // Positive amounts are earned points
+        totalPointsEarned += point.amount;
+      } else {
+        // Negative amounts are redeemed points
+        totalPointsRedeemed += Math.abs(point.amount);
+      }
+    });
+
+    const totalPoints = totalPointsEarned;
+    const availablePoints = totalPointsEarned - totalPointsRedeemed;
 
     // Get recent points history
     const pointsHistory = await prisma.point.findMany({
@@ -52,8 +76,8 @@ export async function GET(req: NextRequest) {
         id: user.id,
         name: user.name,
         email: user.email,
-        totalPoints: user.totalPoints,
-        availablePoints: user.availablePoints,
+        totalPoints: totalPoints,
+        availablePoints: availablePoints,
       },
       history: pointsHistory
     });
@@ -89,13 +113,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Description is required' }, { status: 400 });
     }
 
-    // Get user current points
+    // Get user info
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       select: {
         id: true,
         name: true,
-        availablePoints: true,
       }
     });
 
@@ -103,51 +126,58 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    // Calculate current available points from points table
+    const allPoints = await prisma.point.findMany({
+      where: { userId: decoded.userId },
+      select: {
+        amount: true,
+      }
+    });
+
+    let totalPointsEarned = 0;
+    let totalPointsRedeemed = 0;
+
+    allPoints.forEach(point => {
+      if (point.amount > 0) {
+        totalPointsEarned += point.amount;
+      } else {
+        totalPointsRedeemed += Math.abs(point.amount);
+      }
+    });
+
+    const availablePoints = totalPointsEarned - totalPointsRedeemed;
+
     // Check if user has enough points
-    if (user.availablePoints < amount) {
+    if (availablePoints < amount) {
       return NextResponse.json(
         { 
           error: 'Insufficient points', 
-          available: user.availablePoints,
+          available: availablePoints,
           requested: amount
         }, 
         { status: 400 }
       );
     }
 
-    // Use transaction to ensure consistency
-    const result = await prisma.$transaction(async (tx) => {
-      // Create points redemption record
-      const pointTransaction = await tx.point.create({
-        data: {
-          userId: decoded.userId,
-          type: 'redeemed',
-          amount: -amount, // Negative for redemption
-          description: description,
-        },
-      });
-
-      // Update user's available points
-      const updatedUser = await tx.user.update({
-        where: { id: decoded.userId },
-        data: {
-          availablePoints: { decrement: amount },
-        },
-        select: {
-          availablePoints: true,
-          totalPoints: true,
-        }
-      });
-
-      return { pointTransaction, updatedUser };
+    // Create points redemption record
+    const pointTransaction = await prisma.point.create({
+      data: {
+        userId: decoded.userId,
+        type: 'redeemed',
+        amount: -amount, // Negative for redemption
+        description: description,
+      },
     });
+
+    // Calculate new balance
+    const newBalance = availablePoints - amount;
 
     return NextResponse.json({
       success: true,
       message: `Successfully redeemed ${amount} points for ${description}`,
-      transaction: result.pointTransaction,
-      newBalance: result.updatedUser.availablePoints,
-      totalPoints: result.updatedUser.totalPoints,
+      transaction: pointTransaction,
+      newBalance: newBalance,
+      totalPoints: totalPointsEarned,
     });
 
   } catch (error: any) {

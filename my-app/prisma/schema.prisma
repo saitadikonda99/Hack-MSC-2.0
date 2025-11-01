@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -10,55 +9,71 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  role      String   @default("user") // user, admin
-  isActive  Boolean  @default(true)
-  totalPoints Int    @default(0) // Total points earned
-  availablePoints Int @default(0) // Points available for redemption
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  // Relations
-  reports   Report[]
-  points    Point[]
-  
+  id              Int      @id @default(autoincrement())
+  name            String
+  email           String   @unique
+  password        String
+  role            String   @default("user")
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  availablePoints Int      @default(0)
+  totalPoints     Int      @default(0)
+  points          Point[]
+  reports         Report[]
+  coupons         Coupon[]
+
   @@map("users")
 }
 
 model Report {
-  id        Int      @id @default(autoincrement())
-  lat       Float
-  lng       Float
-  imageUrl  String
-  issueType String
-  severity  Float
-  status    String   @default("pending")
-  assignedTo String?
-  userId    Int      // Required foreign key to User
-  pointsAwarded Int   @default(0) // Points awarded for this report
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  // Relations
-  user      User     @relation(fields: [userId], references: [id])
+  id            Int      @id @default(autoincrement())
+  lat           Float
+  lng           Float
+  imageUrl      String
+  issueType     String
+  severity      Float
+  description   String?  @db.Text
+  status        String   @default("pending")
+  assignedTo    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  userId        Int
+  pointsAwarded Int      @default(0)
+  avgTimeToFix  Int      @default(0)
+  user          User     @relation(fields: [userId], references: [id])
 
+  @@index([userId], map: "reports_userId_fkey")
   @@map("reports")
 }
 
 model Point {
   id          Int      @id @default(autoincrement())
   userId      Int
-  type        String   // 'earned' or 'redeemed'
-  amount      Int      // Positive for earned, negative for redeemed
-  description String   // Description of how points were earned/spent
-  reportId    Int?     // Link to report if points earned from reporting
+  type        String
+  amount      Int
+  description String
+  reportId    Int?
   createdAt   DateTime @default(now())
-  
-  // Relations
   user        User     @relation(fields: [userId], references: [id])
-  
+
+  @@index([userId], map: "points_userId_fkey")
   @@map("points")
+}
+
+model Coupon {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  brand       String   // swiggy, zomato, flipkart, amazon
+  couponCode  String   @unique
+  value       Int      // Value in rupees
+  pointsCost  Int      // Points required to redeem
+  status      String   @default("active") // active, used, expired
+  redeemedAt  DateTime @default(now())
+  usedAt      DateTime?
+  expiresAt   DateTime
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "coupons_userId_fkey")
+  @@map("coupons")
 }

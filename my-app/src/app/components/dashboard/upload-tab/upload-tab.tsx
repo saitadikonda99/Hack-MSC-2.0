@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from 'react'
 import { MapPin, Award, CheckCircle, AlertCircle } from 'lucide-react'
+import { PiCoin } from 'react-icons/pi'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/app/components/ui/card'
 import { Select } from '@/app/components/ui/select'
 import Dropzone from '@/app/components/ui/dropzone'
+import { usePoints } from '@/contexts/PointsContext'
 
 interface UploadTabProps {
   onUpload: (formData: {
@@ -12,40 +14,20 @@ interface UploadTabProps {
     lat: string
     lng: string
     issueType: string
+    description?: string
   }) => Promise<void>
 }
 
 const UploadTab: React.FC<UploadTabProps> = ({ onUpload }) => {
   const [uploadFiles, setUploadFiles] = useState<File[]>([])
   const [issueType, setIssueType] = useState('pothole')
+  const [description, setDescription] = useState('')
   const [uploadLocation, setUploadLocation] = useState({ lat: '', lng: '' })
   const [uploading, setUploading] = useState(false)
   const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-  const [userPoints, setUserPoints] = useState({ total: 0, available: 0 })
-  const [loadingPoints, setLoadingPoints] = useState(true)
+  const { totalPoints, availablePoints, loading: loadingPoints, refreshPoints } = usePoints()
 
-  // Fetch user points
-  const fetchUserPoints = async () => {
-    try {
-      setLoadingPoints(true)
-      const response = await fetch('/api/points', {
-        credentials: 'include'
-      })
-      if (response.ok) {
-        const data = await response.json()
-        setUserPoints({
-          total: data.user.totalPoints,
-          available: data.user.availablePoints
-        })
-      }
-    } catch (error) {
-      console.error('Error fetching points:', error)
-    } finally {
-      setLoadingPoints(false)
-    }
-  }
-
-  // Auto-detect location and fetch points on component mount
+  // Auto-detect location on component mount
   useEffect(() => {
     const getCurrentLocation = () => {
       setLocationStatus('loading')
@@ -70,7 +52,6 @@ const UploadTab: React.FC<UploadTabProps> = ({ onUpload }) => {
     }
 
     getCurrentLocation()
-    fetchUserPoints()
   }, [])
 
   // Handle file upload
@@ -97,7 +78,7 @@ const UploadTab: React.FC<UploadTabProps> = ({ onUpload }) => {
       })
       
       // Refresh points after successful upload
-      await fetchUserPoints()
+      await refreshPoints()
       
       // Reset form on success
       setUploadFiles([])
@@ -115,8 +96,8 @@ const UploadTab: React.FC<UploadTabProps> = ({ onUpload }) => {
       {/* Credit Points Card */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5 text-yellow-500" />
+          <CardTitle className="flex items-center gap-2 text-black">
+            <PiCoin className="text-2xl" />
             Civic Points
           </CardTitle>
           <CardDescription>
@@ -133,13 +114,13 @@ const UploadTab: React.FC<UploadTabProps> = ({ onUpload }) => {
           ) : (
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold text-green-600">{userPoints.available}</p>
-                <p className="text-sm text-muted-foreground">Available Points</p>
-                <p className="text-xs text-gray-500">Total: {userPoints.total}</p>
+                <p className="text-3xl font-bold text-black">{availablePoints}</p>
+                <p className="text-sm text-gray-600">Available Points</p>
+                <p className="text-xs text-gray-500">Total Earned: {totalPoints}</p>
               </div>
               <div className="text-right">
-                <p className="text-sm font-medium">+10-25 points per report</p>
-                <p className="text-xs text-muted-foreground">Redeem for rewards!</p>
+                <p className="text-sm font-medium text-gray-800">+10-25 points per report</p>
+                <p className="text-xs text-gray-600">Redeem for rewards!</p>
               </div>
             </div>
           )}

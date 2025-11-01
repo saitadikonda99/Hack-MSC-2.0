@@ -7,7 +7,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import Dashboard from '@/app/components/dashboard/dashboard';
 import NavigationTabs from '@/app/components/dashboard/navigation-tabs/navigation-tabs';
 import StatsBar from '@/app/components/dashboard/stats-bar/stats-bar';
-import MapTab from '@/app/components/dashboard/map-tab/map-tab';
 import UploadTab from '@/app/components/dashboard/upload-tab/upload-tab';
 import GalleryTab from '@/app/components/dashboard/gallery-tab/gallery-tab';
 
@@ -20,6 +19,7 @@ interface Report {
   status: string;
   createdAt: string;
   imageUrl?: string;
+  description?: string;
 }
 
 export default function DashboardPage() {
@@ -29,8 +29,7 @@ export default function DashboardPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [score, setScore] = useState(75);
   const [loading, setLoading] = useState(true);
-  const [mapLoaded, setMapLoaded] = useState(false);
-  const [activeTab, setActiveTab] = useState<'map' | 'upload' | 'gallery'>('map');
+  const [activeTab, setActiveTab] = useState<'upload' | 'gallery'>('upload');
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -42,7 +41,7 @@ export default function DashboardPage() {
   // Read tab from URL query params
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab === 'map' || tab === 'upload' || tab === 'gallery') {
+    if (tab === 'upload' || tab === 'gallery') {
       setActiveTab(tab);
     }
   }, [searchParams]);
@@ -94,7 +93,7 @@ export default function DashboardPage() {
       if (res.ok) {
         alert('Report uploaded successfully!');
         fetchReports(); // Refresh the reports
-        setActiveTab('map'); // Switch back to map view
+        setActiveTab('gallery'); // Switch to gallery view to see the report
       } else {
         const error = await res.json();
         alert(`Upload failed: ${error.error}`);
@@ -151,16 +150,6 @@ export default function DashboardPage() {
           <StatsBar reports={reports} />
 
           <div className="flex-1">
-            {activeTab === 'map' && (
-              <MapTab
-                reports={reports}
-                loading={loading}
-                score={score}
-                mapLoaded={mapLoaded}
-                onMapLoad={() => setMapLoaded(true)}
-              />
-            )}
-
             {activeTab === 'upload' && (
               <UploadTab onUpload={handleUpload} />
             )}

@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Award, Clock, Gift, TrendingUp, History } from 'lucide-react'
+import { Award, Clock, Gift, TrendingUp, History, Copy, Check } from 'lucide-react'
+import { usePoints } from '@/contexts/PointsContext'
 
 interface PointTransaction {
   id: number
@@ -25,6 +26,26 @@ interface PointsData {
   history: PointTransaction[]
 }
 
+interface Coupon {
+  id: number
+  brand: string
+  couponCode: string
+  value: number
+  pointsCost: number
+  status: string
+  redeemedAt: string
+  usedAt?: string
+  expiresAt: string
+}
+
+interface CouponOption {
+  brand: string
+  name: string
+  pointsCost: number
+  value: number
+  emoji: string
+}
+
 const PointsDashboard = () => {
   const [pointsData, setPointsData] = useState<PointsData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -32,6 +53,7 @@ const PointsDashboard = () => {
   const [redeemAmount, setRedeemAmount] = useState('')
   const [redeemDescription, setRedeemDescription] = useState('')
   const [showRedemption, setShowRedemption] = useState(false)
+  const { refreshPoints } = usePoints()
 
   const fetchPointsData = async () => {
     try {
@@ -91,6 +113,7 @@ const PointsDashboard = () => {
         setRedeemDescription('')
         setShowRedemption(false)
         await fetchPointsData() // Refresh data
+        await refreshPoints() // Refresh points in context for sidebar
       } else {
         const error = await response.json()
         alert(`Redemption failed: ${error.error}`)
