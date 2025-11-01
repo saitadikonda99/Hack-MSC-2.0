@@ -2,7 +2,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import Dashboard from '@/app/components/dashboard/dashboard';
 import NavigationTabs from '@/app/components/dashboard/navigation-tabs/navigation-tabs';
 import StatsBar from '@/app/components/dashboard/stats-bar/stats-bar';
@@ -22,12 +23,21 @@ interface Report {
 }
 
 export default function DashboardPage() {
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [reports, setReports] = useState<Report[]>([]);
   const [score, setScore] = useState(75);
   const [loading, setLoading] = useState(true);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<'map' | 'upload' | 'gallery'>('map');
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/auth/login');
+    }
+  }, [authLoading, user, router]);
 
   // Read tab from URL query params
   useEffect(() => {
@@ -96,6 +106,41 @@ export default function DashboardPage() {
       throw error;
     }
   };
+
+  // Show loading while authentication is being checked
+  if (authLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        flexDirection: 'column',
+        gap: '1rem'
+      }}>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          border: '3px solid #f3f3f3',
+          borderTop: '3px solid #3498db',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <p>Loading...</p>
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  // Don't render if user is not authenticated (will be redirected by useEffect)
+  if (!user) {
+    return null;
+  }
 
   return (
     <Dashboard>

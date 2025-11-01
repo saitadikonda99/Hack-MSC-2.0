@@ -1,12 +1,31 @@
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("user") // user, admin
+  isActive  Boolean  @default(true)
+  totalPoints Int    @default(0) // Total points earned
+  availablePoints Int @default(0) // Points available for redemption
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  reports   Report[]
+  points    Point[]
+  
+  @@map("users")
 }
 
 model Report {
@@ -18,8 +37,28 @@ model Report {
   severity  Float
   status    String   @default("pending")
   assignedTo String?
+  userId    Int      // Required foreign key to User
+  pointsAwarded Int   @default(0) // Points awarded for this report
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("reports")
+}
+
+model Point {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  type        String   // 'earned' or 'redeemed'
+  amount      Int      // Positive for earned, negative for redeemed
+  description String   // Description of how points were earned/spent
+  reportId    Int?     // Link to report if points earned from reporting
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  user        User     @relation(fields: [userId], references: [id])
+  
+  @@map("points")
 }

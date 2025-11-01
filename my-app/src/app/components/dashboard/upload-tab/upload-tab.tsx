@@ -21,9 +21,31 @@ const UploadTab: React.FC<UploadTabProps> = ({ onUpload }) => {
   const [uploadLocation, setUploadLocation] = useState({ lat: '', lng: '' })
   const [uploading, setUploading] = useState(false)
   const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-  const [points, setPoints] = useState(0)
+  const [userPoints, setUserPoints] = useState({ total: 0, available: 0 })
+  const [loadingPoints, setLoadingPoints] = useState(true)
 
-  // Auto-detect location on component mount
+  // Fetch user points
+  const fetchUserPoints = async () => {
+    try {
+      setLoadingPoints(true)
+      const response = await fetch('/api/points', {
+        credentials: 'include'
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setUserPoints({
+          total: data.user.totalPoints,
+          available: data.user.availablePoints
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching points:', error)
+    } finally {
+      setLoadingPoints(false)
+    }
+  }
+
+  // Auto-detect location and fetch points on component mount
   useEffect(() => {
     const getCurrentLocation = () => {
       setLocationStatus('loading')
@@ -48,6 +70,7 @@ const UploadTab: React.FC<UploadTabProps> = ({ onUpload }) => {
     }
 
     getCurrentLocation()
+    fetchUserPoints()
   }, [])
 
   // Handle file upload
@@ -73,16 +96,12 @@ const UploadTab: React.FC<UploadTabProps> = ({ onUpload }) => {
         issueType,
       })
       
-      // Award points for successful upload
-      const earnedPoints = 10 + Math.floor(Math.random() * 15) // 10-25 points
-      setPoints(prev => prev + earnedPoints)
+      // Refresh points after successful upload
+      await fetchUserPoints()
       
       // Reset form on success
       setUploadFiles([])
       setIssueType('pothole')
-      
-      // Show success message
-      alert(`Report uploaded successfully! You earned ${earnedPoints} civic points! 🎉`)
       
     } catch (error) {
       console.error('Upload error:', error)
@@ -105,16 +124,25 @@ const UploadTab: React.FC<UploadTabProps> = ({ onUpload }) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-2xl font-bold">{points}</p>
-              <p className="text-sm text-muted-foreground">Total Points</p>
+          {loadingPoints ? (
+            <div className="flex items-center justify-center">
+              <div className="animate-pulse">
+                <p className="text-lg text-gray-500">Loading points...</p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm font-medium">+10-25 points per report</p>
-              <p className="text-xs text-muted-foreground">Redeem coming soon!</p>
+          ) : (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold text-green-600">{userPoints.available}</p>
+                <p className="text-sm text-muted-foreground">Available Points</p>
+                <p className="text-xs text-gray-500">Total: {userPoints.total}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium">+10-25 points per report</p>
+                <p className="text-xs text-muted-foreground">Redeem for rewards!</p>
+              </div>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 

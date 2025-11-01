@@ -48,6 +48,11 @@ const OrganizationSidebarOptions = [
     icon: () => <IconComponent icon={HiPhotograph} />
   },
   {
+    name: 'Civic Points',
+    link: '/points',
+    icon: () => <IconComponent icon={HiTrendingUp} />
+  },
+  {
     name: 'Analytics',
     link: '/dashboard/analytics',
     icon: () => <IconComponent icon={HiChartBar} />
