@@ -1,0 +1,68 @@
+.ResetPasswordComponent {
+    width: 100%;
+}
+
+.ResetPasswordComponent-in {
+    width: 50%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.reset-one {
+    width: 80%;
+    padding: 2rem 1rem 1rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reset-two {
+    width: 100%;
+    text-align: center;
+}
+
+.reset-two h1 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.reset-two p {
+    font-size: 1rem;
+    color: gray;
+}
+
+.reset-three {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0rem 1rem 0rem;
+}
+
+.reset-input {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.reset-four {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0rem 0rem 2rem 0rem;
+}
+
+.reset-five {
+    width: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

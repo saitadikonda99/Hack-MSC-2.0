@@ -1,0 +1,65 @@
+
+
+.ForgotPasswordComponent {
+    width: 100%;
+}
+
+.ForgotPasswordComponent-in {
+    width: 50%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.forgot-one {
+    width: 80%;
+    margin: auto;
+    padding: 2rem 1rem 1rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.forgot-two {
+    width: 100%;
+    text-align: center;
+}
+
+.forgot-two h1 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.forgot-two p {
+    font-size: 1rem;
+    color: gray;
+}
+
+.forgot-three {
+    width: 80%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0rem;
+}
+
+.forgot-input {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.forgot-four {
+    width: 80%;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
