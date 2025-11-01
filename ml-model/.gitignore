@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.so
+
+# Virtual environment
+venv/
+.env/
+
+# Environment variables
+*.env
+
+# Logs and outputs
+*.log
+logs/
+output/
+runs/
+results/
+*.csv
+
+# YOLO datasets and checkpoints
+yolo_dataset/
+*.pt
+*.weights
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# VSCode / PyCharm
+.vscode/
+.idea/
+
+# Install / build
+build/
+dist/
+*.egg-info/
